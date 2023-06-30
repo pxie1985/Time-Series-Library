@@ -34,7 +34,7 @@ class TimesBlock(nn.Module):
         )
 
     def forward(self, x):
-        B, T, N = x.size()
+        B, T, N = x.size() # B: batch size, T: sequence length, N: number of features
         period_list, period_weight = FFT_for_Period(x, self.k)
 
         res = []
@@ -157,11 +157,11 @@ class Model(nn.Module):
 
     def anomaly_detection(self, x_enc):
         # Normalization from Non-stationary Transformer
-        means = x_enc.mean(1, keepdim=True).detach()
-        x_enc = x_enc - means
+        means = x_enc.mean(1, keepdim=True).detach() # [B,1,C]
+        x_enc = x_enc - means # [B,T,C]
         stdev = torch.sqrt(
-            torch.var(x_enc, dim=1, keepdim=True, unbiased=False) + 1e-5)
-        x_enc /= stdev
+            torch.var(x_enc, dim=1, keepdim=True, unbiased=False) + 1e-5) # [B,1,C]
+        x_enc /= stdev # [B,T,C]
 
         # embedding
         enc_out = self.enc_embedding(x_enc, None)  # [B,T,C]
